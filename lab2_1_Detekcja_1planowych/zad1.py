@@ -68,7 +68,7 @@ for i in range(301, 1090):
     FN = FN + FN_S
 
     old = I2
-    cv.waitKey(1)
+    cv.waitKey(5)
 
 P = FP/(TP+FP)
 R = TP/(FP+FN)
