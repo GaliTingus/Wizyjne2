@@ -25,23 +25,34 @@ for i in range(2, 1090):
     REF = cv.cvtColor(REF, cv.COLOR_BGR2GRAY)  # Zamiana na czarnobiałe
     I2 = cv.cvtColor(I, cv.COLOR_BGR2GRAY)  # Zamiana na czarnobiałe
 
-
     srednia = alfa*I2 + (1-alfa) *srednia_old
     srednia_old=srednia
     srednia = np.uint8(srednia)
-
-
-
-
     new = cv.absdiff(I2, srednia)  # Roznica
-    BIN = cv.threshold(new, 40, 255, cv.THRESH_BINARY)  # Progowanie
+
+    binary_mask_bg = np.uint8(prev_mask == 0)
+    binary_mask_fg = np.uint8(prev_mask == 255)
+    bg_mean_apro_temp = alpha * np.float64(current_frame) + (1 - alpha) * np.float64(prev_bg)
+    bg_mean_apro_temp = np.uint8(bg_mean_apro_temp)
+    bg_mean_apro = np.multiply(bg_mean_apro_temp, binary_mask_bg) + np.multiply(prev_bg, binary_mask_fg)
+
+    # if np.all(old < I2):  # add only on true indices
+    #     mediana = old + 1
+    # elif np.all(old > I2):  # subtract on true indices
+    #     mediana = old - 1
+    # else:
+    #     mediana = old
+    # mediana = np.uint8(mediana)
+    # new = cv.absdiff(I2, mediana)  # Roznica
+
+    BIN = cv.threshold(new, 15, 255, cv.THRESH_BINARY)  # Progowanie
     BIN = BIN[1]
-    BIN = cv.medianBlur(BIN, 3)
+    BIN = cv.medianBlur(BIN, 7)
     kernel = np.ones((3, 3), np.uint8)
+    # BIN = cv.erode(BIN, kernel, iterations=2)
+    BIN = cv.dilate(BIN, kernel, iterations=5)
+    kernel = np.ones((7, 7), np.uint8)
     BIN = cv.erode(BIN, kernel, iterations=1)
-    BIN = cv.dilate(BIN, kernel, iterations=3)
-    #kernel = np.ones((7, 7), np.uint8)
-    #BIN = cv.erode(BIN, kernel, iterations=1)
     # kernel = np.ones((3, 3), np.uint8)
     # BIN = cv.erode(BIN, kernel, iterations=2)
     # BIN = cv.medianBlur(BIN, 7)
@@ -86,5 +97,5 @@ for i in range(2, 1090):
 
 P = TP/(TP+FP)
 R = TP/(TP+FN)
-F1= 2*P*R/(P+R)
+F1 = 2*P*R/(P+R)
 print("F1 = ", F1)

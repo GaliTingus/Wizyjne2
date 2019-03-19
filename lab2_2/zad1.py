@@ -23,27 +23,28 @@ for i in range(2, 1090):
     REF = cv.imread('groundtruth/gt%06d.png' % i)
     REF = cv.cvtColor(REF, cv.COLOR_BGR2GRAY)  # Zamiana na czarnobiałe
     I2 = cv.cvtColor(I, cv.COLOR_BGR2GRAY)  # Zamiana na czarnobiałe
+
+    # ********** BUFOR Z N RAMEK ***************************************
     BUF[:, :, iN] = I2
     iN = iN +1
     if (iN == N):
         iN = 0
 
-    #mediana = np.median(BUF,2)
+    # mediana = np.median(BUF,2)
+    # mediana = np.uint8(mediana)
+    # new = cv.absdiff(I2, mediana)  # Roznica
     srednia = np.mean(BUF,2)
-    #mediana = np.uint8(mediana)
     srednia = np.uint8(srednia)
-
-
-
-
     new = cv.absdiff(I2, srednia)  # Roznica
+    # END BUFFOR
+
     BIN = cv.threshold(new, 30, 255, cv.THRESH_BINARY)  # Progowanie
     BIN = BIN[1]
     BIN = cv.medianBlur(BIN, 3)
     kernel = np.ones((3, 3), np.uint8)
-    #BIN = cv.erode(BIN, kernel, iterations=1)
+    # BIN = cv.erode(BIN, kernel, iterations=1)
     BIN = cv.dilate(BIN, kernel, iterations=3)
-    #kernel = np.ones((7, 7), np.uint8)
+    # kernel = np.ones((7, 7), np.uint8)
     BIN = cv.erode(BIN, kernel, iterations=1)
     # kernel = np.ones((3, 3), np.uint8)
     # BIN = cv.erode(BIN, kernel, iterations=2)
@@ -89,5 +90,5 @@ for i in range(2, 1090):
 
 P = TP/(TP+FP)
 R = TP/(TP+FN)
-F1= 2*P*R/(P+R)
+F1 = 2*P*R/(P+R)
 print("F1 = ", F1)
