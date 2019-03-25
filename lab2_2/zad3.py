@@ -1,22 +1,13 @@
 import cv2 as cv
 import numpy as np
 
-# Wczytanie i wyswietlenie sekwencji
-# for i in range(550,1700,4):
-#     I = cv.imread('input/in%06d.jpg' % i)
-#     cv.imshow("I",I)
-#     cv.waitKey(10)
-TP = TN = FN = FP =0
-N = 60 #rozmiar bufora
-iN = 0;
-
 # Pierwsza klatka
 i = 1
 old = cv.imread('input/in%06d.jpg' % i)
 old = cv.cvtColor(old, cv.COLOR_BGR2GRAY)
 XX, YY = old.shape
-BUF = np.zeros((XX,YY,N),np.uint8) #inicjalizacja bufora
 
+fg_gmm = cv.createBackgroundSubtractorMOG2(varThreshold=16, detectShadows=True)
 # Pętla po obrazach
 for i in range(2, 1090):
     I = cv.imread('input/in%06d.jpg' % i)
@@ -24,26 +15,12 @@ for i in range(2, 1090):
     REF = cv.cvtColor(REF, cv.COLOR_BGR2GRAY)  # Zamiana na czarnobiałe
     I2 = cv.cvtColor(I, cv.COLOR_BGR2GRAY)  # Zamiana na czarnobiałe
 
-    # ********** BUFOR Z N RAMEK ***************************************
-    BUF[:, :, iN] = I2
-    iN = iN +1
-    if (iN == N):
-        iN = 0
-
-    mediana = np.median(BUF, 2)
-    mediana = np.uint8(mediana)
-    new = cv.absdiff(I2, mediana)  # Roznica
-    # srednia = np.mean(BUF,2)
-    # srednia = np.uint8(srednia)
-    # new = cv.absdiff(I2, srednia)  # Roznica
-    # END BUFFOR
-
-    BIN = cv.threshold(new, 30, 255, cv.THRESH_BINARY)  # Progowanie
-    BIN = BIN[1]
-    BIN = cv.medianBlur(BIN, 3)
-    kernel = np.ones((3, 3), np.uint8)
-    # BIN = cv.erode(BIN, kernel, iterations=1)
-    BIN = cv.dilate(BIN, kernel, iterations=3)
+    BIN = fg_gmm.apply(I2, learningRate=-1)
+    # BIN = BIN[1]
+    BIN = cv.medianBlur(BIN, 9)
+    kernel = np.ones((1, 1), np.uint8)
+    BIN = cv.erode(BIN, kernel, iterations=1)
+    BIN = cv.dilate(BIN, kernel, iterations=1)
     # kernel = np.ones((7, 7), np.uint8)
     BIN = cv.erode(BIN, kernel, iterations=1)
     # kernel = np.ones((3, 3), np.uint8)
@@ -69,8 +46,8 @@ for i in range(2, 1090):
 
     height, width = BIN.shape[:2]
     cv.imshow("REF", REF)
-    TP_M = np.logical_and((BIN == 255),(REF == 255)) # iloczyn logiczny odpowiednich elementow macierzy
-    TP_S = np.sum(TP_M) # suma elementow w macierzy
+    TP_M = np.logical_and((BIN == 255), (REF == 255))  # iloczyn logiczny odpowiednich elementow macierzy
+    TP_S = np.sum(TP_M)  # suma elementow w macierzy
     TP = TP + TP_S
 
     TN_M = np.logical_and((BIN == 0), (REF == 0))  # iloczyn logiczny odpowiednich elementow macierzy
@@ -88,7 +65,7 @@ for i in range(2, 1090):
     old = I2
     cv.waitKey(1)
 
-P = TP/(TP+FP)
-R = TP/(TP+FN)
-F1 = 2*P*R/(P+R)
+P = TP / (TP + FP)
+R = TP / (TP + FN)
+F1 = 2 * P * R / (P + R)
 print("F1 = ", F1)
