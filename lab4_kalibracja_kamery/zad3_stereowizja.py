@@ -27,8 +27,8 @@ def write_ply(fn, verts, colors):
 
 def main():
     print('loading images...')
-    imgL = cv.pyrDown(cv.imread(cv.samples.findFile('aloes/aloeL.jpg')))  # downscale images for faster processing
-    imgR = cv.pyrDown(cv.imread(cv.samples.findFile('aloes/aloeR.jpg')))
+    imgL = cv.pyrDown(cv.imread(('aloes/aloeL.jpg')))  # downscale images for faster processing
+    imgR = cv.pyrDown(cv.imread(('aloes/aloeR.jpg')))
     # imgL = cv.imread(cv.samples.findFile('aloes/aloeL.jpg'))  # downscale images for faster processing
     # imgR = cv.imread(cv.samples.findFile('aloes/aloeR.jpg'))
 
@@ -38,7 +38,7 @@ def main():
     num_disp = 112 - min_disp
     stereo = cv.StereoSGBM_create(minDisparity=min_disp,
                                   numDisparities=num_disp,
-                                  blockSize=16,
+                                  blockSize=4,
                                   P1=8 * 3 * window_size ** 2,
                                   P2=32 * 3 * window_size ** 2,
                                   disp12MaxDiff=1,
