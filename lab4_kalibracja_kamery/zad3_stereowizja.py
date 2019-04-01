@@ -33,10 +33,10 @@ def main():
     # imgR = cv.imread(cv.samples.findFile('aloes/aloeR.jpg'))
 
     # disparity range is tuned for 'aloe' image pair
-    window_size = 5
+    window_size = 6
     min_disp = 16
     num_disp = 112 - min_disp
-    stereo = cv.StereoBM_create(minDisparity=min_disp,
+    stereo = cv.StereoSGBM_create(minDisparity=min_disp,
                                   numDisparities=num_disp,
                                   blockSize=16,
                                   P1=8 * 3 * window_size ** 2,
