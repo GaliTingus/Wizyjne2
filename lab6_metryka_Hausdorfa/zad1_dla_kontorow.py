@@ -19,8 +19,8 @@ def normalize_contours(contours):
     tmp=[]
     for i in range(len(x)):
         for ii in range(len(x)):
-            tmp.append(np.sqrt(np.power(x[ii] - x[i],2) + np.power(y[ii] - y[i],2)))
-    distance = np.max(tmp)
+            tmp.append(np.power(x[ii] - x[i],2) + np.power(y[ii] - y[i],2))
+    distance = np.sqrt(np.max(tmp))
     # print("dist",distance)
     M = cv.moments(contours[0])
     cx = int(M['m10'] / M['m00'])
