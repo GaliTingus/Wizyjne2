@@ -91,7 +91,7 @@ distance = float('Inf')
 
 image_list = os.listdir('imgs')
 for img in range(12):#range(len(image_list)):
-    print("szukanie wyspy {} ...".format(img))
+    print("szukanie wyspy {} - {}...".format(img,image_list[img].split('.')[0].split('_')[1]))
     img_wz = cv.imread('imgs/' + image_list[img])
     img_wz = cv.cvtColor(img_wz, cv.COLOR_BGR2GRAY)
     contours_wz, hierarchy_wz = cv.findContours(~img_wz, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
@@ -107,13 +107,13 @@ for img in range(12):#range(len(image_list)):
             gx = cx
             gy = cy
             index = i
-        if distance < 0.095:
+        if distance < 0.090:
             print("Wczesne trafienie")
             break
     if distance == float('Inf'):
         print("Nie znaleziono")
     else:
-        if distance<0.095:
+        if distance<0.090:
             cv.putText(img_oryginal, image_list[img].split('.')[0].split('_')[1], (int(gx), int(gy)),
                    cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0))
             cv.drawContours(img_oryginal, contours, index, (0, 255, 0), 2)
