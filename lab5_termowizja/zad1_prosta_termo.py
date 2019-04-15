@@ -67,3 +67,11 @@ while (cap.isOpened()):
     if cv.waitKey(5) & 0xFF == ord('q'):  # przerwanie petli po wcisnieciu klawisza ’q’
         break
 cap.release()
+
+#Statistics output for each label, including the background label, see below for available statistics. Statistics are accessed via stats[label, COLUMN] where available columns are defined below.
+#
+#cv2.CC_STAT_LEFT The leftmost (x) coordinate which is the inclusive start of the bounding box in the horizontal direction.
+#cv2.CC_STAT_TOP The topmost (y) coordinate which is the inclusive start of the bounding box in the vertical direction.
+#cv2.CC_STAT_WIDTH The horizontal size of the bounding box
+#cv2.CC_STAT_HEIGHT The vertical size of the bounding box
+#cv2.CC_STAT_AREA The total area (in pixels) of the connected component
