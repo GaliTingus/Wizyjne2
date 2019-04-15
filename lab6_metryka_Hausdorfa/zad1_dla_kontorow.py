@@ -10,7 +10,7 @@ img_oryginal = cv.imread('ithaca_q.bmp')
 img = cv.cvtColor(img_oryginal, cv.COLOR_BGR2GRAY)
 # cv.imshow("obraz", img)
 
-contours, hierarchy = cv.findContours(~img, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+im2, contours, hierarchy = cv.findContours(~img, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
 cv.drawContours(img_oryginal, contours, 0, (0, 0, 255), 1)
 
 
@@ -60,7 +60,7 @@ image_list = os.listdir('imgs')
 for i in range(len(image_list)):
     tmp_img = cv.imread('imgs/' + image_list[i])
     tmp_img = cv.cvtColor(tmp_img, cv.COLOR_BGR2GRAY)
-    contours, hierarchy = cv.findContours(~tmp_img, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+    im2, contours, hierarchy = cv.findContours(~tmp_img, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
     x, y, cx, cy = normalize_contours(contours)
     # tmp = np.array([x,y])
     distance_list.append(compute_hausdorff(ITHACA, np.array([x, y])))
