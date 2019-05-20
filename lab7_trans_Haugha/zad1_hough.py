@@ -21,7 +21,7 @@ x_centr = m['m10'] / m['m00']
 y_centr = m['m01'] / m['m00']
 
 # img_cont_ref contours, hierarchy = cv.findContours(image=img_med, mode=cv.RETR_TREE, method=cv.CHAIN_APPROX_NONE)
-contours, hierarchy = cv.findContours(image=img_med, mode=cv.RETR_TREE, method=cv.CHAIN_APPROX_NONE)
+_, contours, _ = cv.findContours(image=img_med, mode=cv.RETR_TREE, method=cv.CHAIN_APPROX_NONE)
 
 # img_cont = cv.drawContours(img_cont_ref/2, contours, 0, (255,0,0))
 # cv.imshow('Imagine contures', img_cont)
