@@ -1,9 +1,7 @@
-import cv2
+import cv2 as cv
 import numpy as np
-
 import matplotlib.pyplot as plt
 from numpy import fft
-
 import os
 from matplotlib.patches import Rectangle
 
@@ -29,9 +27,9 @@ def rotate(x, y, xo, yo, theta):  # rotate x,y around xo,yo by theta (deg)
     return int(xr), int(yr)
 
 
-img = cv2.imread('./obrazy_Mellin/domek_r0_64.pgm', cv2.IMREAD_GRAYSCALE)
-img_org: object = cv2.imread('./obrazy_Mellin/domek_r0_64.pgm', cv2.IMREAD_GRAYSCALE)
-house_img = cv2.imread('./obrazy_Mellin/domek_r120.pgm', cv2.IMREAD_GRAYSCALE)
+img = cv.imread('./obrazy_Mellin/domek_r0_64.pgm', cv.IMREAD_GRAYSCALE)
+img_org = cv.imread('./obrazy_Mellin/domek_r0_64.pgm', cv.IMREAD_GRAYSCALE)
+house_img = cv.imread('./obrazy_Mellin/domek_r120.pgm', cv.IMREAD_GRAYSCALE)
 img = img * hanning2D(img.shape[0])
 
 plt.figure()
@@ -54,9 +52,9 @@ fft_house_abs = np.abs(fft_house_sh) * highpass_filter
 
 R = fft_result.shape[0] // 2.0
 M = 2 * R / np.log(R)
-result_logpol = cv2.logPolar(src=fft_result_abs, center=(R, R), M=M, flags=cv2.INTER_LINEAR + cv2.WARP_FILL_OUTLIERS)
+result_logpol = cv.logPolar(src=fft_result_abs, center=(R, R), M=M, flags=cv.INTER_LINEAR + cv.WARP_FILL_OUTLIERS)
 
-house_logpol = cv2.logPolar(src=fft_house_abs, center=(R, R), M=M, flags=cv2.INTER_LINEAR + cv2.WARP_FILL_OUTLIERS)
+house_logpol = cv.logPolar(src=fft_house_abs, center=(R, R), M=M, flags=cv.INTER_LINEAR + cv.WARP_FILL_OUTLIERS)
 
 fft_result_logpol = fft.fft2(result_logpol)
 fft_house_logpol = fft.fft2(house_logpol)
@@ -74,16 +72,16 @@ else:
     wykl = - wsp_logr  # pomniejszenie
 
 A = (wsp_kata * 360.0) / rozmiar_kata
-scale = np.exp(wykl / M)  # gdzie M to parametr funkcji cv2.logPolar, a wykl wyliczamy jako:
+scale = np.exp(wykl / M)  # gdzie M to parametr funkcji cv.logPolar, a wykl wyliczamy jako:
 kat1 = - A  # gdzie A = (wsp_kata * 360.0 ) /rozmiar_kata
 kat2 = 180 - A
 
 srodekTrans = ((result.shape[0] / 2), (result.shape[1] / 2))
-macierz_translacji_1 = cv2.getRotationMatrix2D((srodekTrans[0], srodekTrans[1]), kat1, scale)
-macierz_translacji_2 = cv2.getRotationMatrix2D((srodekTrans[0], srodekTrans[1]), kat2, scale)
+macierz_translacji_1 = cv.getRotationMatrix2D((srodekTrans[0], srodekTrans[1]), kat1, scale)
+macierz_translacji_2 = cv.getRotationMatrix2D((srodekTrans[0], srodekTrans[1]), kat2, scale)
 
-im_rot_scaled_1 = cv2.warpAffine(result_c, macierz_translacji_1, result.shape)
-im_rot_scaled_2 = cv2.warpAffine(result_c, macierz_translacji_2, result.shape)
+im_rot_scaled_1 = cv.warpAffine(result_c, macierz_translacji_1, result.shape)
+im_rot_scaled_2 = cv.warpAffine(result_c, macierz_translacji_2, result.shape)
 
 im_rot_scaled_fft_1 = np.fft.fft2(im_rot_scaled_1)
 im_rot_scaled_fft_2 = np.fft.fft2(im_rot_scaled_2)
