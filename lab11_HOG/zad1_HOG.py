@@ -1,9 +1,13 @@
 import cv2 as cv
 import numpy as np
 import scipy.ndimage
+# import scipy
 import math
 import matplotlib.pyplot as plt
 import os
+from sklearn import svm
+from sklearn.model_selection import train_test_split
+import sys
 
 
 def HOGpicture(w, bs):  # w - histogramy gradientow obrazu, bs - rozmiarkomorki (u nas 8)
@@ -118,4 +122,76 @@ def hog(im):
     return F
 
 
+DIR = os.path.dirname(sys.argv[0])
+img = cv.imread(DIR + "/pos/per00060.ppm")
 
+F = hog(img)
+
+# %%
+print('Loading data')
+
+DIR = os.path.dirname(sys.argv[0])
+HOG_data = np.zeros([2 * 100, 3781], np.float32)
+for i in range(0, 100):
+    IP = cv.imread(DIR + '/pos/per%05d.ppm' % (i + 1))
+    IN = cv.imread(DIR + '/neg/neg%05d.png' % (i + 1))
+    F = hog(IP)
+    HOG_data[i, 0] = 1;
+    HOG_data[i, 1:] = F;
+    F = hog(IN)
+    HOG_data[i + 100, 0] = 0;
+    HOG_data[i + 100, 1:] = F
+
+labels = HOG_data[:, 0]
+data = HOG_data[:, 1:]
+
+# %%
+print('learn')
+
+clf = svm.SVC(kernel='linear', C=1.0)
+# X = pd.DataFrame(scale(df), index=df.index, columns=data['feature_names'])
+X_train, X_test, y_train, y_test = train_test_split(data, labels, test_size=0.1)
+# X_train = X_train.values.T
+# # X_test = X_test.values.T
+clf.fit(X_train, y_train)
+ypredict = clf.predict(X_test)
+TP = ((ypredict.astype(np.bool) & y_test.astype(np.bool)) == True).sum()
+TN = ((ypredict.astype(np.bool) & y_test.astype(np.bool)) == False).sum()
+FP = ((np.logical_not(ypredict.astype(np.bool)) & y_test.astype(np.bool)) == True).sum()
+FN = ((ypredict.astype(np.bool) & np.logical_not(y_test.astype(np.bool))) == True).sum()
+print("TP: ",TP)
+print("TN: ",TN)
+print("FP: ",FP)
+print("FN: ",FN)
+
+# %%
+
+def findHumans(clf, img, img_nr):
+    step = 16
+    imgFin = img.copy()
+    detect=[]
+    for scale in range(5, 12):
+        imgS = cv.resize(img, (int(img.shape[1] * (scale / 10)), int(img.shape[0] * (scale / 10))))
+        for x in range(0, imgS.shape[1] - 64, step):
+            for y in range(0, imgS.shape[0] - 128, step * 2):
+                if clf.predict(hog(imgS[y:y + 128, x:x + 64]).reshape(1, hog(imgS[y:y + 128, x:x + 64]).shape[0])):
+                    cv.rectangle(imgFin,(int( x // (scale / 10)),int( y // (scale / 10))),
+                                 (int((x + 64) // (scale / 10)), int((y + 128) // (scale / 10))), (0, 255, 0), 2)
+                    detect.append((x,y,scale))
+                print(x, y)
+    plt.figure()
+    plt.imshow(imgFin)
+    plt.show()
+    plt.savefig('fig%d' % img_nr)
+    return detect
+
+# %%
+print('finding humans')
+
+t = []
+# for img_nr in range(1, 5):
+#     img = cv.imread(DIR + '/test/testImage%d.png' % img_nr)
+#     t.append(findHumans(clf, img, img_nr))
+
+img = cv.imread(DIR + '/test/testImage%d.png' % 1)
+t.append(findHumans(clf, img, 1))
